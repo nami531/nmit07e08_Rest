@@ -16,6 +16,8 @@ import examen.nmit07e08.domain.Usuario;
 import examen.nmit07e08.domain.dto.MovimientoDTO;
 import examen.nmit07e08.exception.CuentaNotFound;
 import examen.nmit07e08.exception.MovimientoNotFound;
+import examen.nmit07e08.exception.NotTitularCuenta;
+import examen.nmit07e08.exception.UnauthorizedMovimiento;
 import examen.nmit07e08.repository.CuentaRepository;
 import examen.nmit07e08.repository.MovimientoRepository;
 
@@ -52,8 +54,8 @@ public class MovimientoServiceImpl implements MovimientoService{
         String currentUserRol = authentication.getAuthorities().toString(); 
         if (!currentUserRol.equals("[ROLE_ADMIN]")){
             Usuario usuarioConectado = modelMapper.map((UserDetails) authentication.getPrincipal(), Usuario.class); 
-            if (!cuenta.getTitular().equals(usuarioConectado)) {
-                throw new RuntimeException("No puedes crear un movimiento en una cuenta que no te pertenece"); 
+            if (cuenta.getTitular().getId() != usuarioConectado.getId()) {
+                throw new UnauthorizedMovimiento(); 
             }
         }
 
@@ -77,8 +79,8 @@ public class MovimientoServiceImpl implements MovimientoService{
         String currentUserRol = authentication.getAuthorities().toString(); 
         if (!currentUserRol.equals("[ROLE_ADMIN]")){
             Usuario usuarioConectado = modelMapper.map((UserDetails) authentication.getPrincipal(), Usuario.class); 
-            if (!cuenta.getTitular().equals(usuarioConectado)) {
-                throw new RuntimeException("No puedes editar un movimiento en una cuenta que no te pertenece"); 
+            if (cuenta.getTitular().getId() != usuarioConectado.getId()) {
+                throw new UnauthorizedMovimiento(); 
             }
         }
 
@@ -107,8 +109,8 @@ public class MovimientoServiceImpl implements MovimientoService{
         String currentUserRol = authentication.getAuthorities().toString(); 
         if (!currentUserRol.equals("[ROLE_ADMIN]")){
             Usuario usuarioConectado = modelMapper.map((UserDetails) authentication.getPrincipal(), Usuario.class); 
-            if (!cuenta.getTitular().equals(usuarioConectado)) {
-                throw new RuntimeException("No puedes eliminar un movimiento en una cuenta que no te pertenece"); 
+            if (cuenta.getTitular().getId() != usuarioConectado.getId()) {
+                throw new NotTitularCuenta(); 
             }
         }
         return repository.findByCuenta(cuenta); 

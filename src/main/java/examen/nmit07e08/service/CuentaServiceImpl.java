@@ -49,6 +49,8 @@ public class CuentaServiceImpl implements CuentaService{
         String currentUserRol = authentication.getAuthorities().toString(); 
         if (currentUserRol.equals("[ROLE_USUARIO]")){
             userDetails.cambiarRol(authentication.getName(), Rol.TITULAR.toString()); 
+        }  else{
+            System.out.println("Hola");
         }
 
         Cuenta cuenta2 = modelMapper.map(cuenta, Cuenta.class); 

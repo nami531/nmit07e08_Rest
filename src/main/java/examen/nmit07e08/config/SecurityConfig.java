@@ -73,6 +73,7 @@ public class SecurityConfig {
 
                         // Gestión de usuarios: El administrador es el único que puede hacer CRUD de usuarios
                         .requestMatchers( "/usuarios/**").hasRole("ADMIN")
+                        .requestMatchers("/h2-console/**").permitAll()
 
 
                         
@@ -81,6 +82,9 @@ public class SecurityConfig {
         http.addFilterBefore(authenticationJwtTokenFilter(),
                 UsernamePasswordAuthenticationFilter.class);
         http.cors(Customizer.withDefaults());
+        http.headers(headers -> headers.frameOptions(frameOptions -> frameOptions.disable())); 
+        http.csrf(csrf -> csrf.disable());
+
         return http.build();
     }
 }

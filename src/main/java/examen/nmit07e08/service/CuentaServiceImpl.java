@@ -16,6 +16,7 @@ import examen.nmit07e08.domain.Rol;
 import examen.nmit07e08.domain.Usuario;
 import examen.nmit07e08.domain.dto.CuentaDTO;
 import examen.nmit07e08.exception.CuentaNotFound;
+import examen.nmit07e08.exception.NotTitularCuenta;
 import examen.nmit07e08.repository.CuentaRepository;
 import examen.nmit07e08.repository.UsuarioRepository;
 
@@ -55,7 +56,7 @@ public class CuentaServiceImpl implements CuentaService{
 
         Cuenta cuenta2 = modelMapper.map(cuenta, Cuenta.class); 
         cuenta2.setSaldo(0);
-        Usuario titular = usuarioRepository.findByDni(authentication.getName()).orElseThrow(() -> new UsernameNotFoundException("Usuario no encontrado"));
+        Usuario titular = usuarioRepository.findByDni(authentication.getName()).orElseThrow(() -> new UsernameNotFoundException("Usuario no encontrado putita"));
         cuenta2.setTitular(titular);
         
         return repository.save(cuenta2); 
@@ -70,8 +71,8 @@ public class CuentaServiceImpl implements CuentaService{
         String currentUserRol = authentication.getAuthorities().toString(); 
         if (!currentUserRol.equals("[ROLE_ADMIN]")){
             Usuario usuarioConectado = modelMapper.map((UserDetails) authentication.getPrincipal(), Usuario.class); 
-            if (!cuentaBD.getTitular().equals(usuarioConectado)) {
-                throw new RuntimeException("No puedes editar una cuenta que no te pertenece"); 
+            if (cuentaBD.getTitular().getId() != usuarioConectado.getId()) {
+                throw new NotTitularCuenta(); 
             }
         }
         cuenta.setId(id);
@@ -87,8 +88,8 @@ public class CuentaServiceImpl implements CuentaService{
         String currentUserRol = authentication.getAuthorities().toString(); 
         if (!currentUserRol.equals("[ROLE_ADMIN]")){
             Usuario usuarioConectado = modelMapper.map((UserDetails) authentication.getPrincipal(), Usuario.class); 
-            if (!cuentaBD.getTitular().equals(usuarioConectado)) {
-                throw new RuntimeException("No puedes borrar una cuenta que no te pertenece"); 
+            if (cuentaBD.getTitular().getId() != usuarioConectado.getId()) {
+                throw new NotTitularCuenta(); 
             }
         }
 
